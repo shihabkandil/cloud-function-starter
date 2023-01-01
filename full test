@@ -1,0 +1,29 @@
+import { firestore } from 'firebase-functions';
+import { initializeApp,firestore as _firestore,messaging } from 'firebase-admin';
+initializeApp();
+
+const fieldToMatch = 'keyword';
+const bodyField = 'body';
+export const sendNotificationsToClients = firestore.document('testing_notifications/{docId}').onCreate((snapshot,_) => {
+  const newlyCreatedDocument = snapshot.data();
+  console.log('log entry!, Document Created with Id'+ newlyCreatedDocument.id);
+  const newDocumentBody = newlyCreatedDocument[bodyField];
+  const valueToMatch = newlyCreatedDocument[fieldToMatch];
+
+return _firestore().collection("users").get().then((querySnapshot) => {
+ return querySnapshot.forEach((parentDocument) => {
+     parentDocument.ref.collection("fcm_tokens").where(fieldToMatch, '==', valueToMatch).get().then((querySnapshot) => {
+     const tokens = [];
+        querySnapshot.forEach(doc => {
+          tokens.push(doc.data().fcm_token);
+        });
+        const notification = {
+          title: 'New Document Created',
+          body: newDocumentBody
+        };
+        console.log('almost there to tokens:'+ tokens);
+        return messaging().sendToDevice(tokens, notification);
+      });
+  });
+});
+});
