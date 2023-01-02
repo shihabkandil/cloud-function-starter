@@ -1,0 +1,35 @@
+const functions = require("firebase-functions");
+const admin = require('firebase-admin');
+admin.initializeApp();
+
+
+// Replace with the name of the field you want to match
+const fieldToMatch = 'keyword';
+const bodyField = 'body';
+
+exports.sendNotification = functions.firestore.document('deals/{docId}').onCreate(async (snapshot,_) => {
+  const newlyCreatedDocument = snapshot.data();
+  console.log('log entry!, Document Created with Id'+ newlyCreatedDocument.id);
+  const newDocumentBody = newlyCreatedDocument[bodyField];
+  const valueToMatch = newlyCreatedDocument[fieldToMatch];
+
+    const querySnapshot = await admin.firestore().collection("users").where(fieldToMatch, '==', valueToMatch).get();
+    querySnapshot.forEach((parentDocument) => {
+        parentDocument.ref.collection("fcm_tokens").get().then((querySnapshot_1) => {
+            const tokens = [];
+            querySnapshot_1.forEach(doc => {
+                tokens.push(doc.data().fcm_token);
+            });
+
+            const message = {
+                notification: {
+                    title: 'New Document Created',
+                    body: newDocumentBody
+                },
+            }
+            message.tokens = tokens;
+            console.log('almost there to tokens:' + tokens);
+            return admin.messaging().sendMulticast(message);
+        });
+    });
+});
