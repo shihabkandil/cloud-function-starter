@@ -10,7 +10,7 @@ Follow these steps to get started with the project:
 1. **Clone the repository**: Clone this repository to your local machine using `git clone`.
 
     ```bash
-    git clone https://github.com/your-username/cloud-function-firestore-starter.git
+    git clone https://github.com/shihabkandil/cloud-function-starter.git
     ```
 
 2. **Install dependencies**: Navigate into the cloned directory and install the necessary dependencies using npm or yarn.
@@ -45,7 +45,7 @@ The project structure is organized as follows:
 
 ## Customize the Cloud Function
 
-Feel free to customize the cloud function in `functions/index.js` according to your project requirements. You can listen for different Firestore events such as `onCreate`, `onUpdate`, `onDelete`, etc., and perform actions based on these events.
+Feel free to customize the cloud function in `main.js` according to your project requirements. You can listen for different Firestore events such as `onCreate`, `onUpdate`, `onDelete`, etc., and perform actions based on these events.
 
 ## Contributing
 
